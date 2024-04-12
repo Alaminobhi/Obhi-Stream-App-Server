@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ObhiStream Server</title>
+    <script src="https://cdn.dashjs.org/latest/dash.all.min.js"></script>
+    <style>
+      body {
+        margin: 40px auto;
+        max-width: 650px;
+        line-height: 1.6;
+        font-size: 18px;
+        font-family: "Courier New", Courier, monospace;
+        color: #444;
+        padding: 0 10px;
+      }
+      h2 {
+        line-height: 1.2;
+      }
+    </style>
+  </head>
+ 
+  <body>
+    <h2>HTTP Video Streaming</h2>
+
+
+    <form id="contact-form">
+
+      <label> From Live:
+        <select id="from" name={from} required>
+          <option value="photo">Photo and mp3 To Live</option>
+          <option value="ytvideo">YT Video To Live</option>
+          <option value="filevideo">Video To Live</option>
+          <option value="fbvideo">FB Video To Live</option>
+          <option value="canvas">canvas Video To Live</option>
+        </select>
+      </label>
+      <br/>
+
+      <label>file url link:
+        <input 
+        id="fileurl"
+            type="text" 
+            name={fileurl} 
+            placeholder="file url link"
+            required
+          />
+        </label>
+        <br/>
+
+        <label>mp3 file link:
+          <input 
+          id="mp3url"
+              type="text" 
+              name={mp3url} 
+              placeholder="mp3url file link"
+            />
+          </label>
+          <br/>
+
+        <label> Loops:
+          <select id="loop" name={loop} required>
+            <option value="">No Loop</option>
+            <option value="2">Loop 2</option>
+            <option value="5">Loop 5</option>
+            <option value="-1">Looping</option>
+          </select>
+        </label>
+        <br/>
+        <label> Live In:
+          <select
+          id="url" name={url} required>
+          <option value="">twith</option>
+            <option value="rtmps://live-api-s.facebook.com:443/rtmp">Facebook</option>
+            <option value="rtmp://a.rtmp.youtube.com/live2">Youtube</option>
+            <option value="rtmp://localhost:1935/live">node live</option>
+          </select>
+        </label>
+        <br/>
+        <label> Live Key:
+          <input 
+          id="key"
+            type="text" 
+            name={key} 
+            placeholder="Live Key"
+            required
+          />
+        </label>
+        <br/>
+
+      <button type="submit">Submit</button>
+  </form>
+
+  
+<h1>YouTube Video Download</h1>
+<form id="download-form">
+
+  <label>url link:
+    <input 
+    id="link"
+        type="text" 
+        name={link} 
+        placeholder="url link"
+        required
+      />
+    </label>
+    <br/>
+    
+    <label> File name:
+      <input 
+          id="filename"
+          type="text" 
+          name={filename} 
+          placeholder="File Name"
+          required
+        />
+    </label>
+    <br/>
+    <label> format off from:
+      <select
+      id="format" name={format} required>
+      <option value=".vtt">Audio to vtt</option>
+      <option value=".mp4">yt Video</option>
+        <option value=".mp3">yt Audio</option>
+        <option value=".mp4">fb Video</option>
+        <option value="videotomp3">Video to Audio</option>
+      </select>
+    </label>
+    <br/>
+    
+  <button type="submit">Submit</button>
+</form>
+
+<ul id="list">
+</ul>
+
+  <script>
+
+
+document.getElementById("contact-form").addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    // const name = document.getElementById("name").value;
+    // const email = document.getElementById("email").value;
+
+    const fileurl = document.getElementById("fileurl").value;
+    const mp3url = document.getElementById("mp3url").value;
+    const from = document.getElementById("from").value;
+    const loop = document.getElementById("loop").value;
+    const url = document.getElementById("url").value;
+    const key = document.getElementById("key").value;
+
+    const rtmp = `${url}/${key}`;
+    
+
+    const data = {
+        fileurl: fileurl,
+        mp3url: mp3url,
+        loop: loop,
+        rtmp: rtmp,
+        from: from, 
+    };
+
+    console.log(data);
+
+
+    startstream(data);
+
+});
+
+
+const startstream = async (data) => {
+      
+      try {
+      let url = new URL('http://localhost:5000/livestream');
+      url.search = new URLSearchParams(data);
+
+      const response = await fetch(url);
+      const data2 = await response.json();
+      console.log(data2);
+        if (response.ok) {
+            alert('done properly');
+           
+            // location.reload()
+        }
+
+
+    }
+
+    catch (error) {
+        console.log(error)
+      alert('errr properly', error); 
+       
+    }
+      }
+
+
+//download
+
+
+document.getElementById("download-form").addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    // const name = document.getElementById("name").value;
+    // const email = document.getElementById("email").value;
+
+    const filename = document.getElementById("filename").value;
+    const format = document.getElementById("format").value;
+    const link = document.getElementById("link").value;
+
+
+    const datalink = {
+        filename: filename,
+        urllink: link,
+        format: format
+    };
+
+    console.log(datalink);
+
+
+    startdown(datalink);
+
+});
+
+
+const startdown = async (datalink) => {
+      
+      try {
+      let url = new URL('http://localhost:5000/alldownload');
+      url.search = new URLSearchParams(datalink);
+
+      const response = await fetch(url);
+      const datalink2 = await response.json();
+      console.log(datalink2);
+        if (response.ok) {
+            alert('done properly');
+           
+            // location.reload()
+        }
+
+
+    }
+
+    catch (error) {
+        console.log(error)
+      alert('errr properly', error); 
+       
+    }
+      }
+
+  </script>
+
+
+<ul id="myList"></ul>
+<p id="demo"></p>
+ 
+<script>
+
+let url = new URL('http://localhost:5000/videolist');
+
+async function logMovies(url) {
+  const response = await fetch(url);
+  const movies = await response.json();
+  console.log(movies);
+// return movies;
+let list =
+        document.getElementById("myList");
+
+        movies.forEach((item) => {
+        let li =
+            document.createElement("li");
+        li.addEventListener('click', function () {
+          videostream(item);
+        });
+
+
+        // li.innerText = item;
+        li.innerHTML = item;
+
+       
+            
+       
+        list.appendChild(li);
+    });
+}
+
+
+const videostream = async (data) => {
+      
+  try {
+      let url = new URL('http://localhost:5000/video-live');
+      url.search = new URLSearchParams({item: data});
+
+      const response = await fetch(url);
+      const data2 = await response.json();
+      console.log(data2);
+        if (response.ok) {
+            alert('done properly');
+           
+            // location.reload()
+        }
+
+
+    }
+
+    catch (error) {
+        console.log(error)
+      alert('errr properly', error); 
+       
+    }
+      }
+
+const data = logMovies(url);
+    // let data = ["Ram", "Shyam",
+    //     "Sita", "Gita"];
+    
+</script>
+
+    <video id="videoPlayer" width="650" controls muted="muted" loop>
+      <source src="/video-live" type="video/mp4" />
+    </video>
+
+    <video id="video" width="650" controls muted="muted" loop>
+      <source src='' type="video/mp4" />
+    </video>
+
+
+    <canvas id="canvas"></canvas>
+
+    <script>
+      let canvas = document.getElementById("canvas");
+      let context = canvas.getContext("2d");
+
+    window_width = 720;
+    window_height = window.innerHeight;
+
+    canvas.width = window_width;
+    canvas.height = window_height;
+    canvas.style.background = "#ff8";
+
+    var hit_counter = 0;
+
+class Circle {
+    constructor(xpos, ypos, radius, speed, color, text) {
+
+        this.position_x = xpos;
+        this.position_y = ypos;
+
+        this.radius = radius;
+
+        this.speed = speed;
+
+        this.dx = 1 * this.speed;
+        this.dy = 1 * this.speed;
+
+        this.text = text;
+
+        this.color = color;
+    }
+
+    draw(context) {
+        context.beginPath();
+        context.strokeStyle = this.color;
+        context.fillText(this.text, this.position_x, this.position_y);
+        context.textAlign = "center";
+        context.textBaseline = "middle"
+        context.font = "30px Arial";
+        context.lineWidth = 5;
+        context.arc(this.position_x, this.position_y, this.radius, 0, Math.PI * 2);
+        context.stroke();
+        context.closePath();
+    }
+
+    update() {
+
+        this.draw(context);
+
+        if ( (this.position_x + this.radius) > window_width ) {
+            this.dx = -this.dx;
+            hit_counter++;
+        }
+        
+        if ( (this.position_x - this.radius) < 0 ) {
+            this.dx = -this.dx;
+            hit_counter++;
+        }
+
+        if ( (this.position_y - this.radius) < 0 ) {
+            this.dy = -this.dy;
+            hit_counter++;
+        }
+
+        if ( (this.position_y + this.radius) > window_height ) {
+            this.dy = -this.dy;
+            hit_counter++;
+        }
+
+        this.position_x += this.dx;
+        this.position_y += this.dy; 
+        
+    }
+}
+
+
+let getDistance = function(xpos1, ypos1, xpos2, ypos2) {
+  var result = Math.sqrt(Math.pow(xpos2-xpos1, 2) + Math.pow(ypos2-ypos1, 2));
+  return result;
+}
+
+
+let randomNumber = function(min, max) {
+  var result = Math.random() * (max - min) + min;
+  return result;
+}
+
+
+var all_circles = [];
+
+for (var i = 0; i < 20; i++) {
+
+  var radius = 50;
+  var random_x = randomNumber(radius, (window_width - radius));
+  var random_y = randomNumber(radius, (window_height - radius));
+
+  for( var a = 0; a < all_circles.length; a++) {
+    if ( (getDistance(random_x, random_y, all_circles[a].xpos, all_circles[a].ypos) - radius + all_circles[a].radius < 0) ) {
+      random_x = randomNumber(radius, (window_width-radius));
+      random_y = randomNumber(radius, (window_height-radius));
+    }
+    a = all_circles.length;
+  }
+
+  let my_circle = new Circle(random_x, random_y, radius, 2, 'Black', 'AFIA');
+  all_circles.push(my_circle);
+}
+
+
+let updateCircle = function() {
+  requestAnimationFrame(updateCircle);
+  context.clearRect(0, 0, window_width, window_height);
+
+  all_circles.forEach(element => {
+    element.update();
+  })
+}
+
+updateCircle();
+
+    </script>
+
+
+<canvas id="canvas" width="800" height="600"></canvas>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.3/socket.io.js"></script>
+    <script>
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
+      const socket = io();
+
+      socket.on('canvasData', buffer => {
+          const img = new Image();
+          img.onload = () => {
+              ctx.drawImage(img, 0, 0);
+          };
+          img.src = 'data:image/png;base64,' + buffer.toString('base64');
+      });
+  </script>
+
+<video id="video" width="400" height="300" autoplay></video>
+<canvas id="canvas" width="400" height="300"></canvas>
+<script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const ctx2 = canvas.getContext('2d');
+
+    const displayMediaOptions = {
+        video: {
+          displaySurface: "browser",
+        },
+        audio: {
+          suppressLocalAudioPlayback: false,
+        },
+        preferCurrentTab: false,
+        selfBrowserSurface: "exclude",
+        systemAudio: "include",
+        surfaceSwitching: "include",
+        monitorTypeSurfaces: "include",
+      };
+    // Access the user's webcam
+    navigator.mediaDevices.getDisplayMedia(displayMediaOptions)
+        .then(stream => {
+            video.srcObject = stream;
+        })
+        .catch(err => {
+            console.error('Error accessing webcam:', err);
+        });
+
+    // Draw video frames onto the canvas
+    function drawFrame() {
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        requestAnimationFrame(drawFrame);
+    }
+
+    video.addEventListener('play', drawFrame);
+</script>
+
+  </body>
+</html>
